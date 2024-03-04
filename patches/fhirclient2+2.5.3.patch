@@ -1,0 +1,12 @@
+diff --git a/node_modules/fhirclient2/lib/settings.js b/node_modules/fhirclient2/lib/settings.js
+index 0610dc6..e624e50 100644
+--- a/node_modules/fhirclient2/lib/settings.js
++++ b/node_modules/fhirclient2/lib/settings.js
+@@ -36,4 +36,4 @@ exports.patientParams = ["patient", "subject", "requester", "member", "actor", "
+ /**
+  * The name of the sessionStorage entry that contains the current key
+  */
+-exports.SMART_KEY = "SMART_KEY";
+\ No newline at end of file
++exports.SMART_KEY = "SMART_KEY_2";
+\ No newline at end of file
