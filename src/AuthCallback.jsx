@@ -5,7 +5,7 @@ import FHIR2 from 'fhirclient2';
 
 export default function AuthCallback() {
 
-  FHIR2.oauth2.ready().then((client) => {window.location.href="/";})
+  FHIR2.oauth2.ready().finally((client) => {window.location.href="/";})
 
   return (
     <div>

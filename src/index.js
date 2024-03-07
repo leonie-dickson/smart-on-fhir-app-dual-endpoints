@@ -6,6 +6,7 @@ import AuthCallback from './AuthCallback';
 import FHIR from 'fhirclient';
 import FHIR2 from 'fhirclient2';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
+import PatientProvider from './PatientProvider';
 import AppWrapper from './AppWrapper';
 
 const rootElement = document.getElementById('root');
@@ -14,11 +15,13 @@ const rootElement = document.getElementById('root');
 const configs = [{
     clientId: 'b167e490-b1b5-4ac7-a8c2-5a54223af98d',
     iss: 'https://gw.interop.community/difference/data',
-    scope: 'launch/patient openid profile'
+    scope: 'user/*.read openid profile'
+    // scope: 'launch/patient openid profile'
   },{
     clientId: '3aa4b010-8923-4e45-bc47-5dfc05cf470f',
     iss: 'https://gw.interop.community/differenceb/data',
-    scope: 'launch/patient openid profile'
+    scope: 'user/*.read openid profile'
+    // scope: 'launch/patient openid profile'
   }
 ]
 
@@ -52,7 +55,11 @@ const smartLaunch = () => {
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/">
-      <Route path="/" element={<AppWrapper />} loader={smartLaunch} />
+      <Route path="/" element={
+        <PatientProvider>
+          <AppWrapper />
+        </PatientProvider>
+      } loader={smartLaunch} />
       <Route path="/authcallback" element={<AuthCallback />} />
     </Route>
   )

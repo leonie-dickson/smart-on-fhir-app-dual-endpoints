@@ -1,8 +1,8 @@
 import React,{useEffect,useState} from 'react';
 import './App.css';
 import {ConditionsVisualizer, MedicationRequestVisualizer, ObservationsVisualizer, PatientVisualizer, ServiceRequestVisualizer} from 'fhir-visualizers';
-// import { useForm } from "react-hook-form";
 import {Spinner, Container} from "react-bootstrap";
+import { usePatientContext } from './PatientProvider';
 
 const obsValue = (entry) => {
   if (entry == null) {
@@ -28,6 +28,7 @@ const formatCodeableConcept = (cc) => {
 
 export default function App(props) {
   const { client } = props;
+  const { patientId } = usePatientContext();
   const [patient, setPatient] = useState(null);
   const [obs, setObs] = useState(null);
   const [sReqs, setSReqs] = useState(null);
@@ -35,20 +36,21 @@ export default function App(props) {
   const [medReqs, setMedReqs] = useState(null);
 
   useEffect(() => {
-    client?.patient.read().then((patient) => setPatient(patient));
+    // client?.patient.read().then((patient) => setPatient(patient));
 
-    if (client.patient.id) {
-      client.request(`Patient/${client.patient.id}/$everything`)
+    if (patientId) {
+      client.request(`Patient/${patientId}/$everything`)
       .then((bundle) => {
-        setObs(bundle.entry?.map(e => e.resource).filter(o => o.resourceType === "Observation" && obsValue(o) !== undefined));
-        setSReqs(bundle.entry?.map(e => e.resource).filter(s => s.resourceType === "ServiceRequest"));
-        setConds(bundle.entry?.map(e => e.resource).filter(c => c.resourceType === "Condition"));
-        setMedReqs(bundle.entry?.map(e => e.resource).filter(s => s.resourceType === "MedicationRequest"));
-        console.log(bundle.entry?.map(e => e.resource).filter(s => s.resourceType === "MedicationRequest"))
+        const resources = bundle.entry?.map(e => e.resource);
+        setPatient(resources.find(p => p.resourceType === "Patient"))
+        setObs(resources.filter(o => o.resourceType === "Observation" && obsValue(o) !== undefined));
+        setSReqs(resources.filter(s => s.resourceType === "ServiceRequest"));
+        setConds(resources.filter(c => c.resourceType === "Condition"));
+        setMedReqs(resources.filter(s => s.resourceType === "MedicationRequest"));
       })
       .catch(console.error)
     }
-  }, [client]);
+  }, [client, patientId]);
 
   let pat=patient?
   <PatientVisualizer patient={patient} />
@@ -104,8 +106,7 @@ export default function App(props) {
             { title: 'Author Date', versions: '*', format: 'date', getter: s => s.authoredOn },
             { title: 'Status', versions: '*', getter: s => s.status },
             { title: 'Reason', versions: '*', format: 'code', getter: s => s.reasonCode[0].coding[0] },
-            { title: 'ID', versions: '*', getter: s => s.id },
-            { title: 'Do Not Perform', versions: '*', getter: s => s.doNotPerform },
+            { title: 'ID', versions: '*', getter: s => s.id }
           ]} />
         : null}
       </Container>
